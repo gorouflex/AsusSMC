@@ -60,7 +60,7 @@ SMC_RESULT BDVT::update(const SMC_DATA *src)  {
     state = !state;
 
     AsusSMC *drv = OSDynamicCast(AsusSMC, dst);
-    drv->toggleBatteryConservativeMode(state);
+    drv->toggleBatteryConservativeMode();
 
     lilu_os_memcpy(data, src, size);
     return SmcSuccess;
