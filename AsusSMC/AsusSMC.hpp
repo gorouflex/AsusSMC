@@ -50,7 +50,7 @@ public:
     void toggleAirplaneMode();
     void toggleTouchpad();
     void toggleALS(bool state);
-    void toggleBatteryConservativeMode(bool state);
+    void toggleBatteryConservativeMode();
     void displayOff();
 
 private:
