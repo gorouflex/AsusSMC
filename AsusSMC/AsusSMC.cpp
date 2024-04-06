@@ -385,7 +385,7 @@ void AsusSMC::initBattery() {
 
     isBatteryRSOCAvailable = wmi_dev_is_present(ASUS_WMI_DEVID_RSOC);
     if (isBatteryRSOCAvailable) {
-        toggleBatteryConservativeMode();
+        toggleBatteryConservativeMode(true);
     }
 }
 
@@ -601,29 +601,18 @@ void AsusSMC::toggleALS(bool state) {
     }
 }
 
-void AsusSMC::toggleBatteryConservativeMode() {
-    static int state = 0; // 0 for 59%, 1 for 80%, 2 for disable
-
+void AsusSMC::toggleBatteryConservativeMode(bool state, int percentage = 100) {
     if (!isBatteryRSOCAvailable) {
         DBGLOG("batt", "RSOC unavailable");
         return;
     }
 
-    int rsoc = 100; // default to disable
-    if (state == 0) {
-        rsoc = 59;
-    } else if (state == 1) {
-        rsoc = 80;
-    }
-
-    if (wmi_evaluate_method(ASUS_WMI_METHODID_DEVS, ASUS_WMI_DEVID_RSOC, rsoc) != 1) {
-        SYSLOG("batt", "Failed to set battery conservative mode to %d%%", rsoc);
+    if (wmi_evaluate_method(ASUS_WMI_METHODID_DEVS, ASUS_WMI_DEVID_RSOC, state ? percentage : 100) != 1) {
+        SYSLOG("batt", "Failed to %s battery conservative mode", state ? "enable" : "disable");
     } else {
-        DBGLOG("batt", "Battery conservative mode is set to %d%%", rsoc);
-        setProperty("BatteryConservativeMode", rsoc);
+        DBGLOG("batt", "Battery conservative mode is %s", state ? "enabled" : "disabled");
+        setProperty("BatteryConservativeMode", state);
     }
-
-    state = (state + 1) % 3; // update state for next call
 }
 
 void AsusSMC::displayOff() {
